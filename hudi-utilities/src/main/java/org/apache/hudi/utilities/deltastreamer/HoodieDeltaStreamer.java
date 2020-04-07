@@ -619,4 +619,8 @@ public class HoodieDeltaStreamer implements Serializable {
       }, executor)).toArray(CompletableFuture[]::new)), executor);
     }
   }
+
+  public DeltaSyncService getDeltaSyncService() {
+    return deltaSyncService;
+  }
 }
