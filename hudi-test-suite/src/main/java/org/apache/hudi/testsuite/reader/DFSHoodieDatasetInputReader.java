@@ -18,7 +18,8 @@
 
 package org.apache.hudi.testsuite.reader;
 
-import java.util.NoSuchElementException;
+import org.apache.hudi.avro.HoodieAvroUtils;
+import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.model.FileSlice;
 import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.model.HoodieRecordPayload;
@@ -26,12 +27,10 @@ import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.common.table.view.TableFileSystemView;
 import org.apache.hudi.common.table.log.HoodieMergedLogRecordScanner;
 import org.apache.hudi.common.table.view.HoodieTableFileSystemView;
-import org.apache.hudi.common.fs.FSUtils;
-import org.apache.hudi.avro.HoodieAvroUtils;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.common.util.ValidationUtils;
-import org.apache.hudi.config.HoodieMemoryConfig;
 import org.apache.hudi.client.utils.ParquetReaderIterator;
+import org.apache.hudi.config.HoodieMemoryConfig;
 import org.apache.hudi.hadoop.realtime.AbstractRealtimeRecordReader;
 
 import org.apache.avro.Schema;
@@ -55,6 +54,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
