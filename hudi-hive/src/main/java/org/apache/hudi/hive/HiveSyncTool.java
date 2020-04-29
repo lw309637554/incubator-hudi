@@ -18,13 +18,13 @@
 
 package org.apache.hudi.hive;
 
+import org.apache.hudi.AbstractSyncHoodieClient;
+import org.apache.hudi.AbstractSyncTool;
 import org.apache.hudi.common.util.FSUtils;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.exception.InvalidTableException;
 import org.apache.hudi.hadoop.HoodieParquetInputFormat;
 import org.apache.hudi.hadoop.realtime.HoodieParquetRealtimeInputFormat;
-import org.apache.hudi.hive.HoodieHiveClient.PartitionEvent;
-import org.apache.hudi.hive.HoodieHiveClient.PartitionEvent.PartitionEventType;
 import org.apache.hudi.hive.util.SchemaUtil;
 
 import com.beust.jcommander.JCommander;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * partitions incrementally (all the partitions modified since the last commit)
  */
 @SuppressWarnings("WeakerAccess")
-public class HiveSyncTool {
+public class HiveSyncTool extends AbstractSyncTool {
 
   private static final Logger LOG = LogManager.getLogger(HiveSyncTool.class);
   public static final String SUFFIX_SNAPSHOT_TABLE = "_rt";
@@ -62,6 +62,7 @@ public class HiveSyncTool {
   private final Option<String> roTableTableName;
 
   public HiveSyncTool(HiveSyncConfig cfg, HiveConf configuration, FileSystem fs) {
+    super(configuration.getAllProperties(), fs);
     this.hoodieHiveClient = new HoodieHiveClient(cfg, configuration, fs);
     this.cfg = cfg;
     switch (hoodieHiveClient.getTableType()) {
@@ -175,12 +176,12 @@ public class HiveSyncTool {
   private void syncPartitions(String tableName, List<String> writtenPartitionsSince) {
     try {
       List<Partition> hivePartitions = hoodieHiveClient.scanTablePartitions(tableName);
-      List<PartitionEvent> partitionEvents =
+      List<AbstractSyncHoodieClient.PartitionEvent> partitionEvents =
           hoodieHiveClient.getPartitionEvents(hivePartitions, writtenPartitionsSince);
-      List<String> newPartitions = filterPartitions(partitionEvents, PartitionEventType.ADD);
+      List<String> newPartitions = filterPartitions(partitionEvents, AbstractSyncHoodieClient.PartitionEvent.PartitionEventType.ADD);
       LOG.info("New Partitions " + newPartitions);
       hoodieHiveClient.addPartitionsToTable(tableName, newPartitions);
-      List<String> updatePartitions = filterPartitions(partitionEvents, PartitionEventType.UPDATE);
+      List<String> updatePartitions = filterPartitions(partitionEvents, AbstractSyncHoodieClient.PartitionEvent.PartitionEventType.UPDATE);
       LOG.info("Changed Partitions " + updatePartitions);
       hoodieHiveClient.updatePartitionsToTable(tableName, updatePartitions);
     } catch (Exception e) {
@@ -188,7 +189,7 @@ public class HiveSyncTool {
     }
   }
 
-  private List<String> filterPartitions(List<PartitionEvent> events, PartitionEventType eventType) {
+  private List<String> filterPartitions(List<AbstractSyncHoodieClient.PartitionEvent> events, AbstractSyncHoodieClient.PartitionEvent.PartitionEventType eventType) {
     return events.stream().filter(s -> s.eventType == eventType).map(s -> s.storagePartition)
         .collect(Collectors.toList());
   }

@@ -426,7 +426,7 @@ public class SchemaUtil {
 
   /**
    * Read the schema from the log file on path.
-   * 
+   *
    * @return
    */
   public static MessageType readSchemaFromLogFile(FileSystem fs, Path path) throws IOException {

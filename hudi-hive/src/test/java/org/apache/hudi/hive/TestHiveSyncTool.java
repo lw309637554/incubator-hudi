@@ -18,10 +18,9 @@
 
 package org.apache.hudi.hive;
 
+import org.apache.hudi.AbstractSyncHoodieClient;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.common.util.SchemaTestUtil;
-import org.apache.hudi.hive.HoodieHiveClient.PartitionEvent;
-import org.apache.hudi.hive.HoodieHiveClient.PartitionEvent.PartitionEventType;
 import org.apache.hudi.hive.util.SchemaUtil;
 
 import org.apache.hadoop.hive.metastore.api.Partition;
@@ -195,9 +194,9 @@ public class TestHiveSyncTool {
     List<String> writtenPartitionsSince = hiveClient.getPartitionsWrittenToSince(Option.of(commitTime1));
     assertEquals("We should have one partition written after 100 commit", 1, writtenPartitionsSince.size());
     List<Partition> hivePartitions = hiveClient.scanTablePartitions(TestUtil.hiveSyncConfig.tableName);
-    List<PartitionEvent> partitionEvents = hiveClient.getPartitionEvents(hivePartitions, writtenPartitionsSince);
+    List<AbstractSyncHoodieClient.PartitionEvent> partitionEvents = hiveClient.getPartitionEvents(hivePartitions, writtenPartitionsSince);
     assertEquals("There should be only one paritition event", 1, partitionEvents.size());
-    assertEquals("The one partition event must of type ADD", PartitionEventType.ADD,
+    assertEquals("The one partition event must of type ADD", AbstractSyncHoodieClient.PartitionEvent.PartitionEventType.ADD,
         partitionEvents.iterator().next().eventType);
 
     tool = new HiveSyncTool(TestUtil.hiveSyncConfig, TestUtil.getHiveConf(), TestUtil.fileSystem);
