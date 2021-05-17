@@ -84,6 +84,7 @@ public class SparkExecuteClusteringCommitActionExecutor<T extends HoodieRecordPa
 
   @Override
   public HoodieWriteMetadata<JavaRDD<WriteStatus>> execute() {
+    LOG.info("The clustering plan is " + this.clusteringPlan);
     HoodieInstant instant = HoodieTimeline.getReplaceCommitRequestedInstant(instantTime);
     // Mark instant as clustering inflight
     table.getActiveTimeline().transitionReplaceRequestedToInflight(instant, Option.empty());
@@ -148,9 +149,13 @@ public class SparkExecuteClusteringCommitActionExecutor<T extends HoodieRecordPa
       JavaSparkContext jsc = HoodieSparkEngineContext.getSparkContext(context);
       JavaRDD<HoodieRecord<? extends HoodieRecordPayload>> inputRecords = readRecordsForGroup(jsc, clusteringGroup);
       Schema readerSchema = HoodieAvroUtils.addMetadataFields(new Schema.Parser().parse(config.getSchema()));
-      return ((ClusteringExecutionStrategy<T, JavaRDD<HoodieRecord<? extends HoodieRecordPayload>>, JavaRDD<HoodieKey>, JavaRDD<WriteStatus>>)
-          ReflectionUtils.loadClass(config.getClusteringExecutionStrategyClass(), table, context, config))
-          .performClustering(inputRecords, clusteringGroup.getNumOutputFileGroups(), instantTime, strategyParams, readerSchema);
+      LOG.info("in runClusteringForGroupAsync ");
+      JavaRDD<WriteStatus> pp =
+          ((ClusteringExecutionStrategy<T, JavaRDD<HoodieRecord<? extends HoodieRecordPayload>>, JavaRDD<HoodieKey>, JavaRDD<WriteStatus>>)
+              ReflectionUtils.loadClass(config.getClusteringExecutionStrategyClass(), table, context, config))
+              .performClustering(inputRecords, clusteringGroup.getNumOutputFileGroups(), instantTime, strategyParams, readerSchema);
+      LOG.info("out runClusteringForGroupAsync ");
+      return pp;
     });
 
     return writeStatusesFuture;

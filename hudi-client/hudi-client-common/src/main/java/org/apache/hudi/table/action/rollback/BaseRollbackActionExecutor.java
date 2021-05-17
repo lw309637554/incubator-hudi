@@ -158,8 +158,10 @@ public abstract class BaseRollbackActionExecutor<T extends HoodieRecordPayload, 
           .collect(Collectors.toList());
       if ((instantTimeToRollback != null) && !inflights.isEmpty()
           && (inflights.indexOf(instantTimeToRollback) != inflights.size() - 1)) {
+        int index = inflights.indexOf(instantTimeToRollback);
+        List<String> greaterInflights =  inflights.subList(index, inflights.size() - 1);
         throw new HoodieRollbackException(
-            "Found in-flight commits after time :" + instantTimeToRollback + ", please rollback greater commits first");
+            "Found in-flight commits after time :" + instantTimeToRollback + ", please rollback greater commits first " + greaterInflights);
       }
     }
   }

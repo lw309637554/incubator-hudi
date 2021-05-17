@@ -96,7 +96,7 @@ public class SparkBulkInsertHelper<T extends HoodieRecordPayload, R> extends Abs
          parallelism, table);
     }
 
-    final JavaRDD<HoodieRecord<T>> repartitionedRecords;
+    JavaRDD<HoodieRecord<T>> repartitionedRecords;
     BulkInsertPartitioner partitioner = userDefinedBulkInsertPartitioner.isPresent()
         ? userDefinedBulkInsertPartitioner.get()
         : BulkInsertInternalPartitionerFactory.get(config.getBulkInsertSortMode());

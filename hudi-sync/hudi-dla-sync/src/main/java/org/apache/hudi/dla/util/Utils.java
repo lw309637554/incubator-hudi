@@ -49,6 +49,7 @@ public class Utils {
     properties.put(BATH_PATH, cfg.basePath);
     properties.put(DLA_PARTITION_EXTRACTOR_CLASS_OPT_KEY, cfg.partitionValueExtractorClass);
     properties.put(DLA_ASSUME_DATE_PARTITIONING, String.valueOf(cfg.assumeDatePartitioning));
+    properties.put(DLA_PARTITION_FIELDS_OPT_KEY, StringUtils.join(cfg.partitionFields.toArray(new String[0]), ","));
     properties.put(DLA_SKIP_RO_SUFFIX, String.valueOf(cfg.skipROSuffix));
     properties.put(DLA_SYNC_HIVE_STYLE_PARTITIONING, String.valueOf(cfg.useDLASyncHiveStylePartitioning));
     return properties;

@@ -363,7 +363,7 @@ public class SparkRDDWriteClient<T extends HoodieRecordPayload> extends
     }
     finalizeWrite(table, clusteringCommitTime, writeStats);
     try {
-      LOG.info("Committing Clustering " + clusteringCommitTime + ". Finished with result " + metadata);
+      LOG.info("Committing Clustering " + clusteringCommitTime + ". Finished with result " + metadata.toJsonString());
       table.getActiveTimeline().transitionReplaceInflightToComplete(
           HoodieTimeline.getReplaceCommitInflightInstant(clusteringCommitTime),
           Option.of(metadata.toJsonString().getBytes(StandardCharsets.UTF_8)));

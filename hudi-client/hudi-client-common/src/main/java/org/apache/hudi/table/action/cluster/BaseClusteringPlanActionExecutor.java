@@ -31,12 +31,16 @@ import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.exception.HoodieIOException;
 import org.apache.hudi.table.HoodieTable;
 import org.apache.hudi.table.action.BaseActionExecutor;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
 public abstract class BaseClusteringPlanActionExecutor<T extends HoodieRecordPayload, I, K, O> extends BaseActionExecutor<T, I, K, O, Option<HoodieClusteringPlan>> {
+
+  private static final Logger LOG = LogManager.getLogger(BaseClusteringPlanActionExecutor.class);
 
   private final Option<Map<String, String>> extraMetadata;
 
@@ -55,6 +59,7 @@ public abstract class BaseClusteringPlanActionExecutor<T extends HoodieRecordPay
   public Option<HoodieClusteringPlan> execute() {
     Option<HoodieClusteringPlan> planOption = createClusteringPlan();
     if (planOption.isPresent()) {
+      LOG.info("Clustering plan is " + planOption.get().toString());
       HoodieInstant clusteringInstant =
           new HoodieInstant(HoodieInstant.State.REQUESTED, HoodieTimeline.REPLACE_COMMIT_ACTION, instantTime);
       try {
